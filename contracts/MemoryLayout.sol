@@ -32,7 +32,7 @@ contract MemoryLayout is Ownable, ReentrancyGuard {
     /**
      * @notice define the token address of the vested tokens
      */
-    address public vestedTokenAddress;
+    address public tokenContractAddress;
 
     /**
      * @notice define is the vesting is paused

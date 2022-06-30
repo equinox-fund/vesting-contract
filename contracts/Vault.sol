@@ -10,7 +10,7 @@ contract Vault is MemoryLayout {
     /// @return uint256
     function _getTokenOverflowAmount() private view returns (uint256) {
         return
-            IERC20(vestedTokenAddress).balanceOf(address(this)) -
+            IERC20(tokenContractAddress).balanceOf(address(this)) -
             totalVestedTokens;
     }
 
@@ -19,13 +19,13 @@ contract Vault is MemoryLayout {
     function withdrawOverflowTokens() public nonReentrant onlyOwner {
         uint256 overflow = _getTokenOverflowAmount();
         require(overflow > 0, "no overflow tokens");
-        IERC20(vestedTokenAddress).safeTransfer(owner(), overflow);
+        IERC20(tokenContractAddress).safeTransfer(owner(), overflow);
     }
 
     /// @notice Withdraw all tokens from the contract
     /// @dev Explain to a developer any extra details
     function withdrawAllTokens() public nonReentrant onlyOwner {
-        uint256 balance = IERC20(vestedTokenAddress).balanceOf(address(this));
-        IERC20(vestedTokenAddress).safeTransfer(owner(), balance);
+        uint256 balance = IERC20(tokenContractAddress).balanceOf(address(this));
+        IERC20(tokenContractAddress).safeTransfer(owner(), balance);
     }
 }

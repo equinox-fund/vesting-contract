@@ -10,21 +10,24 @@ contract Vesting is MemoryLayout {
     event Revoked(address user);
 
     /// @notice Vesting contract initialization
-    /// @param _vestedTokenAddress address of the ERC20 token contract
+    /// @param _tokenContractAddress address of the ERC20 token contract
     /// @param _start Start of vesting (unix timestamp)
     /// @param _duration duration of vesting (in seconds)
     /// @param _slicePeriodSeconds slice period (in seconds).
     constructor(
-        address _vestedTokenAddress,
+        address _tokenContractAddress,
         uint256 _start,
         uint256 _duration,
         uint256 _slicePeriodSeconds
     ) {
         require(_duration > 0, "duration must be > 0");
         require(_slicePeriodSeconds >= 1, "slicePeriodSeconds must be >= 1");
-        require(_vestedTokenAddress != address(0x0), "Cannot see 0x0 address");
+        require(
+            _tokenContractAddress != address(0x0),
+            "Cannot see 0x0 address"
+        );
 
-        vestedTokenAddress = _vestedTokenAddress;
+        tokenContractAddress = _tokenContractAddress;
         start = _start;
         duration = _duration;
         slicePeriodSeconds = _slicePeriodSeconds;
@@ -41,6 +44,12 @@ contract Vesting is MemoryLayout {
         isPaused = false;
     }
 
+    /// @notice Return current time
+    /// @dev Easiest for testing
+    function getCurrentTime() internal view virtual returns (uint256) {
+        return block.timestamp;
+    }
+
     /// @notice Compute relesable tokens amount for a given user
     /// @param _user given address
     function computeReleasableAmount(address _user)
@@ -48,7 +57,7 @@ contract Vesting is MemoryLayout {
         view
         returns (uint256)
     {
-        uint256 currentTime = block.timestamp;
+        uint256 currentTime = getCurrentTime();
         uint256 vested = tokensVested[_user];
         uint256 released = tokensReleased[_user];
 
@@ -113,7 +122,7 @@ contract Vesting is MemoryLayout {
     /// @dev the user cannot release anymore tokens and his vesting is reset
     /// @param _user address of users to whom vested tokens are transferred
     function revokeVestingEntry(address _user) external onlyOwner {
-        require(tokensVested[_user] > 0, "user address unknow");
+        require(tokensVested[_user] > 0, "vesting entry not found");
 
         // remove his tokens from the total amount
         totalVestedTokens = totalVestedTokens - tokensVested[_user];
@@ -129,6 +138,7 @@ contract Vesting is MemoryLayout {
      */
     function release(uint256 amount) public nonReentrant {
         require(!isPaused, "Vesting paused");
+        require(tokensVested[msg.sender] != 0, "No vesting entry");
 
         uint256 vestedAmount = computeReleasableAmount(msg.sender);
         require(vestedAmount >= amount, "Cannot release tokens");
@@ -136,7 +146,7 @@ contract Vesting is MemoryLayout {
         tokensReleased[msg.sender] = tokensReleased[msg.sender] + amount;
         totalVestedTokens = totalVestedTokens - amount;
 
-        IERC20(vestedTokenAddress).safeTransfer(msg.sender, amount);
+        IERC20(tokenContractAddress).safeTransfer(msg.sender, amount);
         emit Released(msg.sender, amount);
     }
 }
