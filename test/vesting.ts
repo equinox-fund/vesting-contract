@@ -32,7 +32,7 @@ describe("Test Vesting.sol", function () {
 
   describe("Vesting", () => {
     it("Should deploy contract", async () => {
-      const MockVestingFactory = await ethers.getContractFactory("MockVesting");
+      const MockVestingFactory = await ethers.getContractFactory("Vesting");
       vestingContract = await MockVestingFactory.deploy(
         tokenContract.address,
         start,
@@ -131,7 +131,10 @@ describe("Test Vesting.sol", function () {
         await tokenContract.mintToWallet(vestingContract.address, 1000);
 
         // move to 45 days in the future (half the vesting)
-        await vestingContract.setCurrentTime(start + 45 * dayInSeconds);
+        // await vestingContract.setCurrentTime(start + 45 * dayInSeconds);
+
+        await ethers.provider.send("evm_increaseTime", [45 * dayInSeconds]);
+        await ethers.provider.send("evm_mine", []);
 
         const releasableAmount = await vestingContract.computeReleasableAmount(
           addr1.address
@@ -168,7 +171,9 @@ describe("Test Vesting.sol", function () {
 
       it("should be able to release full tokens because vesting is done", async () => {
         // move to 90 days in the future (end the vesting)
-        await vestingContract.setCurrentTime(start + 90 * dayInSeconds);
+        // await vestingContract.setCurrentTime(start + 90 * dayInSeconds);
+        await ethers.provider.send("evm_increaseTime", [90 * dayInSeconds]);
+        await ethers.provider.send("evm_mine", []);
 
         // the user 2 should be able to release all because the vesting is now finish
         await expect(vestingContract.connect(addr2).release(200))
@@ -182,8 +187,30 @@ describe("Test Vesting.sol", function () {
      */
 
     describe("Vault", () => {
-      it("should be able to withdraw overflow tokens", async () => {});
-      it("should be able to withdraw all tokens", async () => {});
+      it("should be able to withdraw overflow tokens", async () => {
+        // overflow is 600 because 400 tokens have been reserved for users
+        const overflow = 600;
+        await expect(vestingContract.connect(owner).withdrawOverflowTokens())
+          .to.emit(tokenContract, "Transfer")
+          .withArgs(vestingContract.address, owner.address, overflow);
+      });
+
+      it("should not be able to withdraw overflow tokens because empty", async () => {
+        const withdraw = vestingContract
+          .connect(owner)
+          .withdrawOverflowTokens();
+
+        await expect(withdraw).to.be.revertedWith("no overflow tokens");
+      });
+
+      it("should be able to withdraw all tokens", async () => {
+        // we have 100 tokens left because there is user that release only half
+        const balance = 100;
+
+        await expect(vestingContract.connect(owner).withdrawAllTokens())
+          .to.emit(tokenContract, "Transfer")
+          .withArgs(vestingContract.address, owner.address, balance);
+      });
     });
   });
 });

@@ -1,9 +1,10 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.9;
 import "./MemoryLayout.sol";
+import "./Vault.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract Vesting is MemoryLayout {
+contract Vesting is MemoryLayout, Vault {
     using SafeERC20 for IERC20;
 
     event Released(address user, uint256 amount);
@@ -44,12 +45,6 @@ contract Vesting is MemoryLayout {
         isPaused = false;
     }
 
-    /// @notice Return current time
-    /// @dev Easiest for testing
-    function getCurrentTime() internal view virtual returns (uint256) {
-        return block.timestamp;
-    }
-
     /// @notice Compute relesable tokens amount for a given user
     /// @param _user given address
     function computeReleasableAmount(address _user)
@@ -57,7 +52,7 @@ contract Vesting is MemoryLayout {
         view
         returns (uint256)
     {
-        uint256 currentTime = getCurrentTime();
+        uint256 currentTime = block.timestamp;
         uint256 vested = tokensVested[_user];
         uint256 released = tokensReleased[_user];
 
