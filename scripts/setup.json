@@ -1,0 +1,6 @@
+{
+  "tokenContractAddress": "",
+  "startDate": "2022-01-01T00:00:00.000Z",
+  "durationInDays": 90,
+  "slicePeriodInDays": 30
+}

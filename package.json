@@ -1,5 +1,17 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "deploy:bsc:mainnet": "hardhat run scripts/deploy.js --network bscMainnet",
+    "deploy:bsc:testnet": "hardhat run scripts/deploy.js --network bscTestnet",
+    "deploy:eth:mainnet": "hardhat run scripts/deploy.js --network ethMainnet",
+    "deploy:eth:testnet": "hardhat run scripts/deploy.js --network ethTestnet",
+    "deploy:matic:mainnet": "hardhat run scripts/deploy.js --network maticMainnet",
+    "deploy:matic:testnet": "hardhat run scripts/deploy.js --network maticTestnet",
+    "deploy:avax:mainnet": "hardhat run scripts/deploy.js --network avaxMainnet",
+    "deploy:avax:testnet": "hardhat run scripts/deploy.js --network avaxTestnet"
+  },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
@@ -13,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "chai": "^4.3.6",
+    "dayjs": "^1.11.3",
     "dotenv": "^16.0.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.5.0",
