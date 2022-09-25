@@ -57,7 +57,7 @@ Define the interval in days when release happen.
 
 For this example, there is 3 releases every 30 days.
 
-For example, if a user has 900 vested tokens, every 30 days he will receive 300 tokens.
+For example, if a user has 900 vested tokens, every 30 days he can release 300 tokens.
 
 ## Deploy your contract
 
@@ -91,7 +91,7 @@ npm run deploy:matic:testnet
 
 ## Adding vesting entries
 
-This vesting contract works with a whitelist (vesting entries), your users must be on the whitelist to access the vesting.
+This vesting contract works with a whitelist (vesting entries), your users must be on the whitelist to release his tokens.
 
 You must be calling the `addMultipleVestingEntry` from your favorite UI (Defender, Remix, ..) or custom script.
 
