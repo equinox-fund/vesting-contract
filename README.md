@@ -134,3 +134,8 @@ npx hardhat verify --network bscMainnet DEPLOYED_CONTRACT_ADDRESS
 ## Performance optimizations
 
 For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
+
+## Security
+This new contract is not officially audited and verified; however, we considered taking best security practices and used vetted libs like openzeppelin whenever possible. We tested our smart contract using the most actively developed related tools, namely Mythril and Slither, which reported zero security issues.
+
+please contact security [at] equinox.fund if you believe you've found a security vulnerability.
